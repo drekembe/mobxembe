@@ -1,5 +1,6 @@
 import { flow, observable, computed, decorate, action, reaction } from 'mobx'
 import debounce from 'lodash/debounce'
+import uuid from 'uuid/v4'
 
 import other from 'store/other'
 
@@ -16,7 +17,6 @@ class W {
   people = []
   viewing = 20
   filter = ''
-  buttonPressed = false
   zoomon = {
     id: 1,
     object: {},
@@ -27,11 +27,18 @@ class W {
   /**
    * Actions 🚀
    */
-  init = flow(function*() {
+  init = () => {
     this.fetchZoom()
-    const res = yield fetch('http://uinames.com/api/?region=united%20states&amount=200&ext')
+    this.fetchPeople()
+  }
+
+  fetchPeople = flow(function*() {
+    this.loading = true
+    const res = yield fetch(
+      'http://uinames.com/api/?region=bosnia%20and%20herzegovina&amount=200&ext'
+    )
     const json = yield res.json()
-    this.people.replace(json.map((x, id) => ({ id, ...x })))
+    this.people.replace(json.map(x => ({ ...x, id: uuid() })))
     this.loading = false
   })
 
@@ -47,7 +54,6 @@ class W {
 
   fetchZoom = flow(function*() {
     try {
-      console.log('haa')
       this.zoomon.loading = true
       const [res, ,] = yield Promise.all([
         fetch(`https://jsonplaceholder.typicode.com/todos/${this.zoomon.id}`),
@@ -100,6 +106,7 @@ decorate(W, {
   setViewing: action,
   setFilter: action,
   init: action,
+  fetchPeople: action.bound,
   fetchZoom: action,
   setZoomonId: action,
 

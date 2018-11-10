@@ -16,8 +16,8 @@ let Box = posed.div({
 })
 
 const Boo = posed.div({
-  enter: { y: 0, opacity: 1 },
-  exit: { y: 50, opacity: 0 },
+  enter: { scale: 1, opacity: 1 },
+  exit: { scale: 0, opacity: 0 },
 })
 
 let Person = ({ name, surname, photo }) => (
@@ -32,20 +32,20 @@ Person = observer(Person) // don't actually need this because observable.shallow
 
 let PersonList = ({ people }) => (
   <React.Fragment>
-    {people.length > 0 ? (
-      <PoseGroup>
-        {people.map(obj => (
+    <PoseGroup>
+      {people.length > 0 ? (
+        people.map(obj => (
           <Boo key={obj.id}>
             <Person {...obj} />
           </Boo>
-        ))}
-      </PoseGroup>
-    ) : (
-      <React.Fragment>No people matching criteria</React.Fragment>
-    )}
+        ))
+      ) : (
+        <Boo key="nope">No people matching criteria</Boo>
+      )}
+    </PoseGroup>
   </React.Fragment>
 )
-PersonList = observer(PersonList) // don't actually need this because observable.shallow is used for the list
+PersonList = observer(PersonList)
 
 class Main extends Component {
   setViewing = ({ target }) => this.props.mainStore.setViewing(target.value)
@@ -72,32 +72,42 @@ class Main extends Component {
               <input type="text" value={mainStore.filter} onChange={this.setFilter} />
             </div>
             <div>
+              <button onClick={mainStore.fetchPeople}>new ppl</button>
+            </div>
+            <PoseGroup>
+              {mainStore.loading ? (
+                <Boo key="l">
+                  <Loading size="large" />
+                </Boo>
+              ) : (
+                <Boo key="w" className="personContainer">
+                  <PersonList people={mainStore.first} />
+                </Boo>
+              )}
+            </PoseGroup>
+            <div>{otherStore.advice}</div>
+            <div>
               {' '}
-              zoomonId:
+              enter quote id to fetch:
               <input
                 type="number"
                 value={mainStore.zoomon.id}
                 min={0}
                 onChange={e => mainStore.setZoomonId(e.target.value)}
               />
-              <Box className="box" pose={mainStore.zoomon.id === '5' ? 'visible' : 'hidden'}>
-                I'm a box {mainStore.zoomon.id}
-              </Box>
-              <PoseGroup>{mainStore.zoomon.id === '7' && <Boo key={7}>hooo</Boo>}</PoseGroup>
             </div>
             <div>
-              {mainStore.zoomon.error ||
-                (mainStore.zoomon.loading ? <Loading /> : mainStore.zoomon.object.title)}
+              <PoseGroup>
+                {mainStore.zoomon.error ||
+                  (mainStore.zoomon.loading ? (
+                    <Boo key="l">
+                      <Loading />
+                    </Boo>
+                  ) : (
+                    <Boo key="m">{mainStore.zoomon.object.title}</Boo>
+                  ))}
+              </PoseGroup>
             </div>
-            <p>{mainStore.advice}</p>
-            <div className="personContainer">
-              {mainStore.loading ? (
-                <Loading size="large" />
-              ) : (
-                <PersonList people={mainStore.first} />
-              )}
-            </div>
-            <div>{otherStore.advice}</div>
           </div>
           <DevTools />
         </div>
