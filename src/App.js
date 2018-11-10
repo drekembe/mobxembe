@@ -6,8 +6,19 @@ import { observer, inject, Provider } from 'mobx-react'
 import { configure } from 'mobx'
 import Loading from 'Loading'
 import DevTools from 'mobx-react-devtools'
+import posed, { PoseGroup } from 'react-pose'
 
 configure({ enforceActions: 'always' })
+
+let Box = posed.div({
+  visible: { scaleX: 1 },
+  hidden: { scaleX: 0 },
+})
+
+const Boo = posed.div({
+  enter: { y: 0, opacity: 1 },
+  exit: { y: 50, opacity: 0 },
+})
 
 let Person = ({ name, surname, photo }) => (
   <div className="person">
@@ -22,7 +33,13 @@ Person = observer(Person) // don't actually need this because observable.shallow
 let PersonList = ({ people }) => (
   <React.Fragment>
     {people.length > 0 ? (
-      people.map(obj => <Person key={obj.id} {...obj} />)
+      <PoseGroup>
+        {people.map(obj => (
+          <Boo key={obj.id}>
+            <Person {...obj} />
+          </Boo>
+        ))}
+      </PoseGroup>
     ) : (
       <React.Fragment>No people matching criteria</React.Fragment>
     )}
@@ -63,6 +80,10 @@ class Main extends Component {
                 min={0}
                 onChange={e => mainStore.setZoomonId(e.target.value)}
               />
+              <Box className="box" pose={mainStore.zoomon.id === '5' ? 'visible' : 'hidden'}>
+                I'm a box {mainStore.zoomon.id}
+              </Box>
+              <PoseGroup>{mainStore.zoomon.id === '7' && <Boo key={7}>hooo</Boo>}</PoseGroup>
             </div>
             <div>
               {mainStore.zoomon.error ||

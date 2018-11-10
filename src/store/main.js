@@ -16,6 +16,7 @@ class W {
   people = []
   viewing = 20
   filter = ''
+  buttonPressed = false
   zoomon = {
     id: 1,
     object: {},
@@ -46,6 +47,7 @@ class W {
 
   fetchZoom = flow(function*() {
     try {
+      console.log('haa')
       this.zoomon.loading = true
       const [res, ,] = yield Promise.all([
         fetch(`https://jsonplaceholder.typicode.com/todos/${this.zoomon.id}`),
