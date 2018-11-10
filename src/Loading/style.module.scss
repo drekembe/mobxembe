@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon {
+  rect {
+    fill: deeppink;
+  }
+  &.small {
+    height: 25px;
+  }
+  &.medium {
+    height: 50px;
+  }
+  &.large {
+    height: 100px;
+  }
+}

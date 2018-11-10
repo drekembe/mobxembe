@@ -1,4 +1,7 @@
-import { flow, observable, computed, decorate, action } from 'mobx'
+import { flow, observable, computed, decorate, action, reaction } from 'mobx'
+import debounce from 'lodash/debounce'
+
+import other from 'store/other'
 
 const tm = t =>
   new Promise((res, rec) => {
@@ -10,22 +13,24 @@ class W {
    * Observables 👁
    */
   loading = true
-  count = 0
-  todos = []
-  viewing = 10
+  people = []
+  viewing = 20
   filter = ''
+  zoomon = {
+    id: 1,
+    object: {},
+    error: false,
+    loading: false,
+  }
 
   /**
    * Actions 🚀
    */
   init = flow(function*() {
-    const [res, ,] = yield Promise.all([
-      fetch('https://jsonplaceholder.typicode.com/todos'),
-      tm(1000),
-    ])
-    console.log(res)
+    this.fetchZoom()
+    const res = yield fetch('http://uinames.com/api/?region=united%20states&amount=200&ext')
     const json = yield res.json()
-    this.todos.replace(json)
+    this.people.replace(json.map((x, id) => ({ id, ...x })))
     this.loading = false
   })
 
@@ -35,32 +40,68 @@ class W {
   setFilter = w => {
     this.filter = w
   }
-  increaseCount = () => {
-    this.count = this.count + 1
+  setZoomonId = w => {
+    this.zoomon.id = w
   }
+
+  fetchZoom = flow(function*() {
+    try {
+      this.zoomon.loading = true
+      const [res, ,] = yield Promise.all([
+        fetch(`https://jsonplaceholder.typicode.com/todos/${this.zoomon.id}`),
+        tm(400),
+      ])
+      if (res.status !== 200) {
+        throw res
+      }
+      this.zoomon.object = yield res.json()
+      this.zoomon.error = false
+    } catch (err) {
+      this.zoomon.error = err
+    } finally {
+      this.zoomon.loading = false
+    }
+  })
+
+  fetchZoomDebounced = debounce(this.fetchZoom, 1000)
 
   /**
    * Computed 💻
    */
   get first() {
-    return this.todos.filter(({ title }) => title.includes(this.filter)).slice(0, this.viewing)
+    return this.people
+      .filter(({ name, surname }) =>
+        `${name} ${surname}`.toLowerCase().includes(this.filter.toLowerCase())
+      )
+      .slice(0, this.viewing)
   }
-  get howMuch() {
-    return this.count * 2
+
+  get advice() {
+    // we can easily use stuff from other stores, if we want
+    return other.advice
   }
+
+  /** Reactions */
+  r = reaction(() => this.zoomon.id, id => this.fetchZoomDebounced(), {
+    // delay: 1000, <-- using lodash debounce cause this actually throttles
+    name: 'fetch zoom reaction',
+  })
 }
 
 decorate(W, {
   loading: observable,
-  count: observable,
-  todos: observable,
+  people: observable.shallow,
   viewing: observable,
   filter: observable,
-  increaseCount: action,
+  zoomon: observable,
+
   setViewing: action,
   setFilter: action,
   init: action,
-  howMuch: computed,
+  fetchZoom: action,
+  setZoomonId: action,
+
+  advice: computed,
   first: computed,
 })
 
