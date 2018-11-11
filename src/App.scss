@@ -1,3 +1,5 @@
+@import '~react-bulma-components/src/index.sass';
+@import '~_variables.sass';
 .App {
 }
 
@@ -10,38 +12,52 @@
   color: #61dafb;
 }
 
-.container {
-  display: block;
-  width: 80%;
-  text-align: center;
-  margin: 0 auto;
-  padding: 20px 0;
+.mainWrapper {
+  min-height: 100vh;
   font-size: 1.2em;
-  input {
-    font-size: 1.2em;
-  }
 }
 
-.personContainer {
+.personList {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+}
+
+.fullHeight {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  height: 100%;
+  padding: 12px;
+  background-color: $primary;
+  .label {
+    color: white;
+  }
+}
+
+.main {
+  > div {
+    height: 100%;
+  }
+}
+
+.innerContainer {
+  width: 100%;
 }
 
 .person {
   font-size: 24px;
   display: flex;
   flex-direction: row;
-  background-color: dodgerblue;
   align-items: center;
-  color: white;
-  padding-right: 0.3em;
-  border-radius: 0.3em;
   margin: 0.5em;
   img {
     width: 50px;
     height: 50px;
     border-radius: 0.3em;
+    margin-right: 0.3em;
   }
   > div {
     padding: 5px;

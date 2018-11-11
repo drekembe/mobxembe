@@ -1,23 +1,21 @@
 import { flow, observable, computed, decorate, action, reaction } from 'mobx'
 import debounce from 'lodash/debounce'
+import orderBy from 'lodash/orderBy'
 import uuid from 'uuid/v4'
 
-import other from 'store/other'
+import otherStore from 'store/other'
 
-const tm = t =>
-  new Promise((res, rec) => {
-    setTimeout(res, t)
-  })
-
-class W {
+class MainStore {
   /**
    * Observables 👁
    */
   loading = true
   people = []
-  viewing = 20
+  viewing = 30
+  orderBy = 'id'
+  orderDirection = 'asc'
   filter = ''
-  zoomon = {
+  todo = {
     id: 1,
     object: {},
     error: false,
@@ -28,19 +26,38 @@ class W {
    * Actions 🚀
    */
   init = () => {
-    this.fetchZoom()
+    this.fetchTodo()
     this.fetchPeople()
+    return this
   }
 
   fetchPeople = flow(function*() {
     this.loading = true
     const res = yield fetch(
-      'http://uinames.com/api/?region=bosnia%20and%20herzegovina&amount=200&ext'
+      'http://uinames.com/api/?region=bosnia%20and%20herzegovina&amount=150&ext'
     )
     const json = yield res.json()
     this.people.replace(json.map(x => ({ ...x, id: uuid() })))
     this.loading = false
   })
+
+  fetchTodo = flow(function*() {
+    try {
+      this.todo.loading = true
+      const res = yield fetch(`https://jsonplaceholder.typicode.com/todos/${this.todo.id}`)
+      if (res.status !== 200) {
+        throw res
+      }
+      this.todo.object = yield res.json()
+      this.todo.error = false
+    } catch (err) {
+      this.todo.error = true
+    } finally {
+      this.todo.loading = false
+    }
+  })
+
+  fetchTodoDebounced = debounce(this.fetchTodo, 1000)
 
   setViewing = n => {
     this.viewing = n
@@ -48,73 +65,68 @@ class W {
   setFilter = w => {
     this.filter = w
   }
-  setZoomonId = w => {
-    this.zoomon.id = w
+  setTodoId = w => {
+    this.todo.id = w
   }
-
-  fetchZoom = flow(function*() {
-    try {
-      this.zoomon.loading = true
-      const [res, ,] = yield Promise.all([
-        fetch(`https://jsonplaceholder.typicode.com/todos/${this.zoomon.id}`),
-        tm(500),
-      ])
-      if (res.status !== 200) {
-        throw res
-      }
-      this.zoomon.object = yield res.json()
-      this.zoomon.error = false
-    } catch (err) {
-      this.zoomon.error = err
-    } finally {
-      this.zoomon.loading = false
-    }
-  })
-
-  fetchZoomDebounced = debounce(this.fetchZoom, 1000)
+  setOrderBy = order => {
+    this.orderBy = order
+  }
+  toggleDirection = () => {
+    this.orderDirection = this.orderDirection === 'asc' ? 'desc' : 'asc'
+  }
 
   /**
    * Computed 💻
    */
-  get first() {
-    return this.people
-      .filter(({ name, surname }) =>
-        `${name} ${surname}`.toLowerCase().includes(this.filter.toLowerCase())
-      )
-      .slice(0, this.viewing)
+
+  get filtered() {
+    return this.people.filter(({ name, surname }) =>
+      `${name} ${surname}`.toLowerCase().includes(this.filter.toLowerCase())
+    )
+  }
+
+  get ordered() {
+    return orderBy(this.filtered, [this.orderBy], [this.orderDirection])
+  }
+
+  get sliced() {
+    return this.ordered.slice(0, this.viewing)
   }
 
   get advice() {
     // we can easily use stuff from other stores, if we want
-    return other.advice
+    return otherStore.advice
   }
 
   /** Reactions */
-  r = reaction(() => this.zoomon.id, id => this.fetchZoomDebounced(), {
+  r = reaction(() => this.todo.id, id => this.fetchTodoDebounced(), {
     // delay: 1000, <-- using lodash debounce cause this actually throttles
-    name: 'fetch zoom reaction',
+    name: 'fetch todo reaction',
   })
 }
 
-decorate(W, {
+decorate(MainStore, {
   loading: observable,
   people: observable.shallow,
   viewing: observable,
   filter: observable,
-  zoomon: observable,
+  todo: observable,
+  orderBy: observable,
+  orderDirection: observable,
 
   setViewing: action,
   setFilter: action,
   init: action,
   fetchPeople: action.bound,
-  fetchZoom: action,
-  setZoomonId: action,
+  fetchTodo: action.bound,
+  setTodoId: action,
+  setOrderBy: action,
+  toggleDirection: action,
 
   advice: computed,
-  first: computed,
+  ordered: computed,
+  filtered: computed,
+  sliced: computed,
 })
 
-const w = new W()
-w.init()
-
-export default w
+export default new MainStore().init()

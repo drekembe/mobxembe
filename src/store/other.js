@@ -8,7 +8,7 @@ import {
 
 import main from 'store/main'
 
-class Other {
+class OtherStore {
   boo = 'yoohoo'
   advice = ''
   init = flow(function*(boo) {
@@ -16,18 +16,17 @@ class Other {
     const json = yield res.json()
     this.advice = json.slip.advice
     this.boo = boo
+    return this
   })
   get mainFilter() {
     return main.filter + '!'
   }
 }
 
-decorate(Other, {
+decorate(OtherStore, {
   boo: observable,
   advice: observable,
   mainFilter: computed,
 })
 
-const o = new Other()
-o.init('hoho')
-export default o
+export default new OtherStore().init('hoho')

@@ -9,16 +9,18 @@ const Boo = posed.div({
 })
 
 let PersonList = ({ people }) => (
-  <PoseGroup>
-    {people.length > 0 ? (
-      people.map(obj => (
-        <Boo key={obj.id}>
-          <Person {...obj} />
-        </Boo>
-      ))
-    ) : (
-      <Boo key="nope">No people matching criteria</Boo>
-    )}
-  </PoseGroup>
+  <div className="personList">
+    <PoseGroup>
+      {people.length > 0 ? (
+        people.map(obj => (
+          <Boo key={obj.id}>
+            <Person {...obj} />
+          </Boo>
+        ))
+      ) : (
+        <Boo key="nope">No people matching criteria</Boo>
+      )}
+    </PoseGroup>
+  </div>
 )
 export default observer(PersonList)
