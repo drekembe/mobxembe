@@ -7,45 +7,14 @@ import { configure } from 'mobx'
 import Loading from 'Loading'
 import DevTools from 'mobx-react-devtools'
 import posed, { PoseGroup } from 'react-pose'
+import PersonList from 'components/PersonList'
 
 configure({ enforceActions: 'always' })
-
-let Box = posed.div({
-  visible: { scaleX: 1 },
-  hidden: { scaleX: 0 },
-})
 
 const Boo = posed.div({
   enter: { scale: 1, opacity: 1 },
   exit: { scale: 0, opacity: 0 },
 })
-
-let Person = ({ name, surname, photo }) => (
-  <div className="person">
-    <img src={photo} alt="person" />
-    <div>
-      {name} {surname}
-    </div>
-  </div>
-)
-Person = observer(Person) // don't actually need this because observable.shallow is used for the list
-
-let PersonList = ({ people }) => (
-  <React.Fragment>
-    <PoseGroup>
-      {people.length > 0 ? (
-        people.map(obj => (
-          <Boo key={obj.id}>
-            <Person {...obj} />
-          </Boo>
-        ))
-      ) : (
-        <Boo key="nope">No people matching criteria</Boo>
-      )}
-    </PoseGroup>
-  </React.Fragment>
-)
-PersonList = observer(PersonList)
 
 class Main extends Component {
   setViewing = ({ target }) => this.props.mainStore.setViewing(target.value)
@@ -58,9 +27,6 @@ class Main extends Component {
       <Provider mainStore={main}>
         <div className="App">
           <div className="container">
-            <p>
-              Edit <code>src/App.js</code> and save to reload.
-            </p>
             <div>
               {' '}
               length:
@@ -74,6 +40,7 @@ class Main extends Component {
             <div>
               <button onClick={mainStore.fetchPeople}>new ppl</button>
             </div>
+            <pre>{`${mainStore.loading}`}</pre>
             <PoseGroup>
               {mainStore.loading ? (
                 <Boo key="l">

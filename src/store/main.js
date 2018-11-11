@@ -57,7 +57,7 @@ class W {
       this.zoomon.loading = true
       const [res, ,] = yield Promise.all([
         fetch(`https://jsonplaceholder.typicode.com/todos/${this.zoomon.id}`),
-        tm(400),
+        tm(500),
       ])
       if (res.status !== 200) {
         throw res
