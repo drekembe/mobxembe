@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/mobxembe/precache-manifest.4d84efc28c6755f0b2d30d316f115401.js"
+  "/mobxembe/precache-manifest.5e125ff542090db62451a410336b5dcc.js"
 );
 
 workbox.clientsClaim();
