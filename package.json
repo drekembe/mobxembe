@@ -2,6 +2,7 @@
   "name": "bananamart",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://drekembe.github.io/mobxembe",
   "dependencies": {
     "classnames": "^2.2.6",
     "history": "^4.7.2",
@@ -24,15 +25,15 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "predeploy": "npm run biuld",
+    "deploy": "gh-pages -d build",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"],
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
+  }
 }
