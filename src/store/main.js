@@ -34,7 +34,7 @@ class MainStore {
   fetchPeople = flow(function*() {
     this.loading = true
     const res = yield fetch(
-      'http://uinames.com/api/?region=bosnia%20and%20herzegovina&amount=150&ext'
+      'https://uinames.com/api/?region=bosnia%20and%20herzegovina&amount=150&ext'
     )
     const json = yield res.json()
     this.people.replace(json.map(x => ({ ...x, id: uuid() })))
