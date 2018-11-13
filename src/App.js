@@ -9,6 +9,7 @@ import './App.scss'
 import mainStore from './store/main'
 import otherStore from './store/other'
 import routerStore from './store/router'
+import messageStore from './store/messages'
 import { observer, inject, Provider } from 'mobx-react'
 import { configure } from 'mobx'
 import Loading from 'Loading'
@@ -19,7 +20,6 @@ import PersonList from 'components/PersonList'
 import Columns from 'react-bulma-components/lib/components/columns'
 import { Field, Label, Control, Input, Select } from 'react-bulma-components/lib/components/form'
 import Button from 'react-bulma-components/lib/components/button'
-import Box from 'react-bulma-components/lib/components/box'
 
 configure({ enforceActions: 'observed' })
 
@@ -38,7 +38,7 @@ class Main extends Component {
     this.props.mainStore.setOrderBy(target.value)
   }
   render() {
-    const { mainStore, otherStore } = this.props
+    const { mainStore, otherStore, messageStore } = this.props
     return (
       <React.Fragment>
         <Columns multiline={false} className="mainWrapper is-marginless">
@@ -119,6 +119,14 @@ class Main extends Component {
                       </PoseGroup>
                     )}
                   </div>
+                  <div>
+                    <pre>{JSON.stringify(messageStore.messages, null, 2)}</pre>
+                    <Button
+                      color="primary"
+                      onClick={() => messageStore.pushMessage(mainStore.filter)}>
+                      new msg
+                    </Button>
+                  </div>
                 </Boo>
               )}
             </PoseGroup>
@@ -130,7 +138,7 @@ class Main extends Component {
   }
 }
 
-const RealMain = inject('mainStore', 'otherStore', 'routerStore')(observer(Main))
+const RealMain = inject('mainStore', 'otherStore', 'routerStore', 'messageStore')(observer(Main))
 
 const history = createBrowserHistory()
 
@@ -147,7 +155,11 @@ const withRouterStore = store => WrappedComponent => {
 }
 
 const App = () => (
-  <Provider mainStore={mainStore} otherStore={otherStore} routerStore={routerStore}>
+  <Provider
+    mainStore={mainStore}
+    otherStore={otherStore}
+    routerStore={routerStore}
+    messageStore={messageStore}>
     <Router history={history}>
       <React.Fragment>
         <Route exact path="/" component={withRouterStore(routerStore)(RealMain)} />
