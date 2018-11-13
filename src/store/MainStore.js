@@ -3,8 +3,6 @@ import debounce from 'lodash/debounce'
 import orderBy from 'lodash/orderBy'
 import uuid from 'uuid/v4'
 
-import otherStore from 'store/other'
-
 class MainStore {
   /**
    * Observables 👁
@@ -28,7 +26,6 @@ class MainStore {
   init = () => {
     this.fetchTodo()
     this.fetchPeople()
-    return this
   }
 
   fetchPeople = flow(function*() {
@@ -93,11 +90,6 @@ class MainStore {
     return this.ordered.slice(0, this.viewing)
   }
 
-  get advice() {
-    // we can easily use stuff from other stores, if we want
-    return otherStore.advice
-  }
-
   /** Reactions */
   r = reaction(() => this.todo.id, id => this.fetchTodoDebounced(), {
     // delay: 1000, <-- using lodash debounce cause this actually throttles
@@ -123,10 +115,9 @@ decorate(MainStore, {
   setOrderBy: action,
   toggleDirection: action,
 
-  advice: computed,
   ordered: computed,
   filtered: computed,
   sliced: computed,
 })
 
-export default new MainStore().init()
+export default MainStore

@@ -6,16 +6,14 @@ import {
 } from 'react-router-dom'
 import { createBrowserHistory } from 'history'
 import './App.scss'
-import mainStore from './store/main'
-import otherStore from './store/other'
-import routerStore from './store/router'
-import messageStore from './store/messages'
+import RootStore from 'store/RootStore'
 import { observer, inject, Provider } from 'mobx-react'
 import { configure } from 'mobx'
 import Loading from 'Loading'
 import DevTools from 'mobx-react-devtools'
 import posed, { PoseGroup } from 'react-pose'
 import PersonList from 'components/PersonList'
+import Messages from 'components/Messages'
 
 import Columns from 'react-bulma-components/lib/components/columns'
 import { Field, Label, Control, Input, Select } from 'react-bulma-components/lib/components/form'
@@ -38,9 +36,10 @@ class Main extends Component {
     this.props.mainStore.setOrderBy(target.value)
   }
   render() {
-    const { mainStore, otherStore, messageStore } = this.props
+    const { mainStore } = this.props
     return (
       <React.Fragment>
+        <Messages />
         <Columns multiline={false} className="mainWrapper is-marginless">
           <Columns.Column className="is-one-quarter is-paddingless">
             <div className="sidebar">
@@ -93,7 +92,6 @@ class Main extends Component {
                   <Button color="primary" onClick={mainStore.fetchPeople}>
                     Fetch new
                   </Button>
-                  <div>{otherStore.advice}</div>
                   <div>
                     {' '}
                     enter todo id to fetch:
@@ -119,14 +117,6 @@ class Main extends Component {
                       </PoseGroup>
                     )}
                   </div>
-                  <div>
-                    <pre>{JSON.stringify(messageStore.messages, null, 2)}</pre>
-                    <Button
-                      color="primary"
-                      onClick={() => messageStore.pushMessage(mainStore.filter)}>
-                      new msg
-                    </Button>
-                  </div>
                 </Boo>
               )}
             </PoseGroup>
@@ -138,7 +128,11 @@ class Main extends Component {
   }
 }
 
-const RealMain = inject('mainStore', 'otherStore', 'routerStore', 'messageStore')(observer(Main))
+const RealMain = inject(({ rootStore }) => ({
+  mainStore: rootStore.mainStore,
+  routerStore: rootStore.routerStore,
+  messagesStore: rootStore.messagesStore,
+}))(observer(Main))
 
 const history = createBrowserHistory()
 
@@ -154,12 +148,10 @@ const withRouterStore = store => WrappedComponent => {
   }
 }
 
+const rootStore = new RootStore()
+const routerStore = rootStore.routerStore
 const App = () => (
-  <Provider
-    mainStore={mainStore}
-    otherStore={otherStore}
-    routerStore={routerStore}
-    messageStore={messageStore}>
+  <Provider rootStore={rootStore}>
     <Router history={history}>
       <React.Fragment>
         <Route exact path="/" component={withRouterStore(routerStore)(RealMain)} />
