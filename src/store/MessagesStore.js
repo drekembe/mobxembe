@@ -20,7 +20,7 @@ class MessagesStore {
     )
     reaction(
       () => this.rootStore.mainStore.people.map(({ id }) => id),
-      people => this.pushMessage('Got new people')
+      people => this.pushMessage(`Got new ${people.length} people`)
     )
   }
 
