@@ -8,15 +8,15 @@ self.__precacheManifest = [
     "url": "/mobxembe/static/js/runtime~main.48088eca.js"
   },
   {
-    "revision": "cd2da8d6bede476bcd44",
-    "url": "/mobxembe/static/js/main.cd2da8d6.chunk.js"
+    "revision": "0212e4535e81ac1ee20e",
+    "url": "/mobxembe/static/js/main.0212e453.chunk.js"
   },
   {
     "revision": "eaf3023be7bc8065c53b",
     "url": "/mobxembe/static/js/1.eaf3023b.chunk.js"
   },
   {
-    "revision": "cd2da8d6bede476bcd44",
+    "revision": "0212e4535e81ac1ee20e",
     "url": "/mobxembe/static/css/main.8334ed0c.chunk.css"
   },
   {
@@ -24,7 +24,7 @@ self.__precacheManifest = [
     "url": "/mobxembe/static/css/1.7fd3a741.chunk.css"
   },
   {
-    "revision": "9750203bc12133b4323104c3a11f62ef",
+    "revision": "2522e2d9100206b09f924783e96726d4",
     "url": "/mobxembe/index.html"
   }
 ];
